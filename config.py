@@ -1,16 +1,9 @@
 from sqlalchemy import create_engine, text
 
-# db = {
-#     'user': 'root',
-#     'password': 'wlrkq159',
-#     'host': 'localhost',
-#     'port': 3306,
-#     'database': 'miniter'
-# }
 db = {
     'user': 'root',
     'password': 'wlrkq159',
-    'host': 'python-backend-test.czxaclupuy9k.ap-northeast-2.rds.amazonaws.com',
+    'host': 'localhost',
     'port': 3306,
     'database': 'miniter'
 }
