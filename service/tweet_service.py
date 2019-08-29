@@ -13,8 +13,7 @@ class TweetService():
     def get_timeline(self, user_id):
 
         follow_ids = self.tweet_dao.get_follow_ids(user_id)
-        exist_ids = follow_ids + [str(user_id)]
-        exist_ids = ','.join(exist_ids)
+        exist_ids = follow_ids + [user_id]
 
         tweets = self.tweet_dao.get_tweets(exist_ids)
 

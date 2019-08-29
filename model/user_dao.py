@@ -45,5 +45,5 @@ class UserDao():
         rows = self.db.execute(text("""SELECT * from users""")).fetchall()
         data = {}
         for row in rows:
-            data[row['id']] = (row['name'], row['email'], row['profile'])
+            data[f"{row['id']}"] = (row['name'], row['email'], row['profile'])
         return data

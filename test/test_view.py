@@ -4,7 +4,6 @@ import pytest
 from app import create_app
 import bcrypt
 import json
-
 database = create_engine(
     config.test_config['DB_URL'], encoding='UTF-8', max_overflow=0)
 

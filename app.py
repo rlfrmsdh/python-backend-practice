@@ -15,7 +15,7 @@ def create_app(test_config=None):
     CORS(app)
 
     if test_config is None:
-        app.config.from_pyfile("config.py")
+        app.config.from_pyfile("test/config.py")
     else:
         app.config.update(test_config)
 
@@ -26,8 +26,8 @@ def create_app(test_config=None):
     tweetDao = TweetDao(database)
 
     service = Service()
-    service.tweetService = TweetService(tweetDao)
-    service.userService = UserService(userDao, app.config)
+    service.tweet_service = TweetService(tweetDao)
+    service.user_service = UserService(userDao, app.config)
 
     create_endpoints(app, service)
 

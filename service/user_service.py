@@ -50,7 +50,7 @@ class UserService():
         return self.user_dao.insert_follow(user_follow)
 
     def unfollow_user(self, user_id, unfollow_id):
-        user_unfollow = {'id': user_id, 'follow': unfollow_id}
+        user_unfollow = {'id': user_id, 'unfollow': unfollow_id}
         return self.user_dao.insert_unfollow(user_unfollow)
 
     def show_user_list(self):
