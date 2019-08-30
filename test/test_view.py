@@ -4,12 +4,16 @@ import pytest
 from app import create_app
 import bcrypt
 import json
+import io
+from unittest import mock
 database = create_engine(
     config.test_config['DB_URL'], encoding='UTF-8', max_overflow=0)
 
 
 @pytest.fixture
-def api():
+@mock.patch("service.user_service.boto3")
+def api(mock_boto3):
+    mock_boto3.client.return_value = mock.Mock()
     app = create_app(config.test_config)
     app.config['TEST'] = True
     api = app.test_client()
@@ -145,12 +149,25 @@ def test_tweet(api):
     assert tweets_data['timeline'] == [{"user_id": 1,
                                         "tweet": "Hoollly~~"}]
 
-    # row = database.execute(text("""SELECT (id, user_id, tweet) FROM tweets
-    #                         WHERE user_id=1"""))
 
+def test_upload_profile_picture(api):
+    resp = api.post("/login",
+                    data=json.dumps(
+                        {"email": "rlfrmsdh@nextlab.co.kr", "password": "wlrkq159"}),
+                    content_type="application/json")
+    token = json.loads(resp.data.decode('utf-8'))
+    assert token.get('access_token')
 
-# if __name__ == "__main__":
-    # api_ = api()
-    # setup_function()
-    # test_tweet(api_)
-    # teardown_function()
+    ret = api.get("/profile-picture/1")
+    # img_url = json.loads(ret.data.decode('utf-8'))
+    assert ret.data.decode('utf-8') is ''
+
+    resp = api.post("/profile-picture",
+                    content_type='multipart/form-data',
+                    headers={'Authorization': token['access_token']},
+                    data={"profile_pic": (io.BytesIO(b'some image here'), 'profile.png')})
+    assert resp.status_code == 200
+
+    ret = api.get("/profile-picture/1")
+    img_url = json.loads(ret.data.decode('utf-8'))
+    assert img_url['img_url'] == "https://s3.ap-northeast-2.amazonaws.com/python-backend-miniter-test/profile.png"

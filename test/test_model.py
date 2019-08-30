@@ -118,3 +118,21 @@ def test_get_all_users(user_dao):
     users = user_dao.get_all_users()
     assert users['1'] == ('GilGeuno', 'rlfrmsdh@nextlab.co.kr', 'Developer')
     assert users['2'] == ('GongDeok', 'GongDeok@google.com', 'station')
+
+
+def test_picture_path_save(user_dao):
+    user_dao.picture_path_save(1, 'test_path')
+    row = database.execute(
+        text(f"""SELECT profile_picture FROM users WHERE id= 1""")).fetchone()
+    assert row['profile_picture'] == 'test_path'
+
+
+def test_get_pic_path(user_dao):
+    user_dao.picture_path_save(1, 'test_path')
+    path = user_dao.get_pic_path(1)
+    assert path == 'test_path'
+
+
+# if __name__ == "__main__":
+#     userDao = user_dao()
+#     test_picture_path_save(userDao)

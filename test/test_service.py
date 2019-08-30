@@ -4,13 +4,16 @@ import pytest
 from sqlalchemy import create_engine, text
 import config
 import bcrypt
+from unittest import mock
 
 database = create_engine(
     config.test_config['DB_URL'], encoding='utf-8', max_overflow=0)
 
 
 @pytest.fixture
-def user_service():
+@mock.patch("service.user_service.boto3")
+def user_service(mock_boto3):
+    mock_boto3.client.return_value = mock.Mock()
     userDao = UserDao(database)
     return UserService(userDao, config.test_config)
 
@@ -66,3 +69,14 @@ def test_create_new_user(user_service):
     new_user_info = user_service.get_user_by_id(3)
     assert new_user_info['id'] == 3 and new_user_info['name'] == 'Gil' and\
         new_user_info['profile'] == 'Developer' and new_user_info['email'] == 'gil@gmail.com'
+
+
+def test_profile_pic_save_get(user_service):
+    pic_url = user_service.get_prof_pic_url(1)
+    assert pic_url is None
+    picture = mock.Mock()
+    filename = "test.png"
+    user_id = 1
+    user_service.profile_pic_save(picture, filename, user_id)
+    saved_pic_url = user_service.get_prof_pic_url(1)
+    assert saved_pic_url == "https://s3.ap-northeast-2.amazonaws.com/python-backend-miniter-test/test.png"

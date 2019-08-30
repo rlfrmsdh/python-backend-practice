@@ -1,12 +1,16 @@
 import bcrypt
 import jwt
+import os
 from datetime import datetime, timedelta
+import boto3
 
 
 class UserService():
     def __init__(self, user_dao, config):
         self.user_dao = user_dao
         self.config = config
+        self.s3 = boto3.client("s3", aws_access_key_id=config['S3_ACCESS_KEY'],
+                               aws_secret_access_key=config['S3_SECRET_KEY'])
 
     def create_new_user(self, user):
         user['password'] = bcrypt.hashpw(
@@ -55,3 +59,11 @@ class UserService():
 
     def show_user_list(self):
         return self.user_dao.get_all_users()
+
+    def profile_pic_save(self, picture, filename, user_id):
+        self.s3.upload_fileobj(picture, self.config['S3_BUCKET'], filename)
+        image_url = f"{self.config['S3_BUCKET_URL']}{filename}"
+        return self.user_dao.picture_path_save(user_id, image_url)
+
+    def get_prof_pic_url(self, user_id):
+        return self.user_dao.get_pic_path(user_id)

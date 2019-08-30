@@ -47,3 +47,11 @@ class UserDao():
         for row in rows:
             data[f"{row['id']}"] = (row['name'], row['email'], row['profile'])
         return data
+
+    def picture_path_save(self, user_id, path):
+        return self.db.execute(text("""UPDATE users SET profile_picture= :path WHERE id = :user_id"""), {'path': path, 'user_id': user_id}).rowcount
+
+    def get_pic_path(self, user_id):
+        row = self.db.execute(
+            text(f"""SELECT profile_picture FROM users WHERE id = {user_id}""")).fetchone()
+        return row['profile_picture'] if row else None

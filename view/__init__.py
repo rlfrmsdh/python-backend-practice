@@ -1,5 +1,6 @@
-from flask import request, jsonify, current_app, Response, g
+from flask import request, jsonify, current_app, Response, g, send_file
 from flask.json import JSONEncoder
+from werkzeug.utils import secure_filename
 import bcrypt
 import jwt
 import functools
@@ -56,6 +57,32 @@ def create_endpoints(app, services):
             return jsonify(token)
         else:
             return '', 401
+
+    @app.route("/profile-picture", methods=['POST'])
+    @login_required
+    def upload_profile_picture():
+        user_id = g.user_id
+        if 'profile_pic' not in request.files:
+
+            return 'File is missing', 401
+        profile_pic = request.files['profile_pic']
+
+        if profile_pic.filename == '':
+            return 'File is missing', 401
+        print("request.files : ", request.files)
+        filename = secure_filename(profile_pic.filename)
+        user_service.profile_pic_save(profile_pic, filename, user_id)
+
+        return '', 200
+
+    @app.route("/profile-picture/<int:user_id>", methods=['GET'])
+    def download_profile_picture(user_id):
+        img_path = user_service.get_prof_pic_url(user_id)
+
+        if img_path:
+            return jsonify({'img_url': img_path})
+        else:
+            return '', 404
 
     @app.route("/tweet", methods=['POST'])  # tweet
     @login_required

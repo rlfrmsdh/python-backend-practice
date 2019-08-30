@@ -15,7 +15,7 @@ def create_app(test_config=None):
     CORS(app)
 
     if test_config is None:
-        app.config.from_pyfile("test/config.py")
+        app.config.from_pyfile("config.py")
     else:
         app.config.update(test_config)
 
